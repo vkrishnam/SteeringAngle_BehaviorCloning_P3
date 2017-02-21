@@ -144,15 +144,15 @@ def steering_angle_prediction_model_description():
     # Preprocess incoming data, normalize centered around zero with small standard deviation
     model.add(Lambda(lambda x: x/127.5 - 1., input_shape=(60, 320, 3), output_shape=(60, 320, 3)))
     # Conv0
-    model.add(Convolution2D(8, 1, 1, activation='relu', name="conv0"))
+    model.add(Convolution2D( 8, 1, 1, activation='relu', border_mode='same', name="conv0"))
     # Conv1
-    model.add(Convolution2D(16, 3, 3, activation='relu', name="conv1"))
+    model.add(Convolution2D(16, 3, 3, activation='relu', border_mode='same', name="conv1"))
     model.add(MaxPooling2D((2, 2)))
     # Conv2
-    model.add(Convolution2D(16, 5, 5, activation='relu', name="conv2"))
+    model.add(Convolution2D( 8, 3, 3, activation='relu', border_mode='same', name="conv2"))
     model.add(MaxPooling2D((2, 2)))
     # Conv3
-    model.add(Convolution2D(32, 5, 5, activation='relu', name="conv3"))
+    model.add(Convolution2D( 4, 3, 3, activation='relu', border_mode='same', name="conv3"))
     model.add(MaxPooling2D((2, 2)))
     # Conv4
     #model.add(Convolution2D(64, 3, 3, activation='relu', name="conv4"))
