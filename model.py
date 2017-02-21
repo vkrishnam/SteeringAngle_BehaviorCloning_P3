@@ -161,10 +161,10 @@ def steering_angle_prediction_model_description():
     # Flatten
     model.add(Flatten())
     # FC1
-    model.add(Dense(1024, name="fc1"))
-    model.add(Activation('relu'))
+    #model.add(Dense(1024, name="fc1"))
+    #model.add(Activation('relu'))
     # Dropout
-    model.add(Dropout(0.5))
+    #model.add(Dropout(0.5))
     # FC2
     model.add(Dense(128, name="fc2"))
     model.add(Activation('relu'))
