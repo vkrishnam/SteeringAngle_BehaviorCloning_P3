@@ -215,6 +215,9 @@ def massageTheData(samples, percentage=0.9):
 def main(_):
     """
     Main function
+
+    Typical usage:
+    python model.py --data_folder hillData/ --num_epoch 3 --angle_correction 0.25 --percentage_zero 0.97
     """
     #print("Data folder is: ",FLAGS.data_folder)
     samples = []
