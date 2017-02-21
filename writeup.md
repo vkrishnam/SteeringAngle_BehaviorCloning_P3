@@ -12,10 +12,10 @@ The goals / steps of this project are the following:
 * [X] Build, a convolution neural network in Keras that predicts steering angles from images
 * [X] Train and validate the model with a data already shared
 * [X] Sanity test of the model with Simulator
-* [] Use the simulator to collect data of good driving behavior
-* [] Test that the model successfully drives around track one without leaving the road
-* [] Focus on collecting more data with second track to make model generalize better
-* [] Summarize the results with a written report
+* [X] Use the simulator to collect data of good driving behavior
+* [X] Test that the model successfully drives around track one without leaving the road
+* [X] Focus on collecting more data with second track to make model generalize better
+* [X] Summarize the results with a written report
 
 
 [//]: # (Image References)
@@ -29,7 +29,7 @@ The goals / steps of this project are the following:
 [image7]: ./examples/placeholder_small.png "Flipped Image"
 
 ## Rubric Points
-###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.
+### I have given due consideration to the [rubric points](https://review.udacity.com/#!/rubrics/432/view) of the project individually and would be describing how those are addressed in the implementation.
 
 ---
 ###Files Submitted & Code Quality
@@ -37,10 +37,10 @@ The goals / steps of this project are the following:
 ####1. Submission includes all required files and can be used to run the simulator in autonomous mode
 
 My project includes the following files:
-* model.py containing the script to create and train the model
-* drive.py for driving the car in autonomous mode
-* model.h5 containing a trained convolution neural network
-* writeup.md summarizing the results
+* model.py - containing the script to create and train the model
+* drive.py - for driving the car in autonomous mode
+* model.h5 - containing a trained convolution neural network
+* writeup.md - summarizing the results
 
 ####2. Submssion includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing
@@ -55,21 +55,68 @@ The file shows the pipeline I used for training and validating the model, and it
 
 ###Model Architecture and Training Strategy
 
-####1. An appropriate model arcthiecture has been employed
+####1. Model archiitecture
 
-My model consists of a convolution neural network with 3x3 filter sizes and depths between 32 and 128 (model.py lines 18-24)
+Although initial Model experimented is highly inspired from NVIDIA end-to-end model architecture. Later it has been pruned to the following to reduce the complexity, size, paramters involved and training/inference times of the model.
 
-The model includes RELU layers to introduce nonlinearity (code line 20), and the data is normalized in the model using a Keras lambda layer (code line 18).
+For the model articulated in Keras, see the function
+'''
+steering_angle_prediction_model_description()
+'''
+The initial stages of cropping and normalization of pixels has been made as part of the model for two reasons, as those be needed even while model is deployed and other reason being as those operations being done by GPU during training and increasing the training time.
+
+====================================================================================================
+cropping2d_1 (Cropping2D)        (None, 60, 320, 3)    0           cropping2d_input_1[0][0]
+____________________________________________________________________________________________________
+lambda_1 (Lambda)                (None, 60, 320, 3)    0           cropping2d_1[0][0]
+____________________________________________________________________________________________________
+conv0 (Convolution2D)            (None, 60, 320, 8)    32          lambda_1[0][0]
+____________________________________________________________________________________________________
+conv1 (Convolution2D)            (None, 60, 320, 16)   1168        conv0[0][0]
+____________________________________________________________________________________________________
+maxpooling2d_1 (MaxPooling2D)    (None, 30, 160, 16)   0           conv1[0][0]
+____________________________________________________________________________________________________
+conv2 (Convolution2D)            (None, 30, 160, 8)    1160        maxpooling2d_1[0][0]
+____________________________________________________________________________________________________
+maxpooling2d_2 (MaxPooling2D)    (None, 15, 80, 8)     0           conv2[0][0]
+____________________________________________________________________________________________________
+conv3 (Convolution2D)            (None, 15, 80, 4)     292         maxpooling2d_2[0][0]
+____________________________________________________________________________________________________
+maxpooling2d_3 (MaxPooling2D)    (None, 7, 40, 4)      0           conv3[0][0]
+____________________________________________________________________________________________________
+flatten_1 (Flatten)              (None, 1120)          0           maxpooling2d_3[0][0]
+____________________________________________________________________________________________________
+fc2 (Dense)                      (None, 128)           143488      flatten_1[0][0]
+____________________________________________________________________________________________________
+activation_1 (Activation)        (None, 128)           0           fc2[0][0]
+____________________________________________________________________________________________________
+dropout_1 (Dropout)              (None, 128)           0           activation_1[0][0]
+____________________________________________________________________________________________________
+fc3 (Dense)                      (None, 10)            1290        dropout_1[0][0]
+____________________________________________________________________________________________________
+activation_2 (Activation)        (None, 10)            0           fc3[0][0]
+____________________________________________________________________________________________________
+dense_1 (Dense)                  (None, 1)             11          activation_2[0][0]
+====================================================================================================
+
 
 ####2. Attempts to reduce overfitting in the model
 
-The model contains dropout layers in order to reduce overfitting (model.py lines 21).
-
-The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model contains dropout layers inbetween FullyConnected layers and MaxPolling inbetween Conv layers in order to reduce overfitting.
+The model was trained and validated on different data sets to ensure that the model was not overfitting.
+See the function
+'''
+massageTheData(samples, percentage=0.9)
+'''
+The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
 ####3. Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 25).
+The model used an adam optimizer, so the learning rate was not tuned manually.
+Other parameters for the training of the model are
+num_epoch to 3
+angle correction used for left and right cameras is 0.25
+percentage of data of zero steering angle to be dropped is 0.95
 
 ####4. Appropriate training data
 
