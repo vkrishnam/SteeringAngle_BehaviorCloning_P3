@@ -192,6 +192,10 @@ def plotHistogram1(samples):
 
 
 def massageTheData(samples, percentage=0.9):
+    """
+    Rationale of this function is to selectively drop the zero steering angle data as talked about in the below blog.
+    https://mez.github.io/deep%20learning/2017/02/14/mainsqueeze-the-52-parameter-model-that-drives-in-the-udacity-simulator/
+    """
     from sklearn.utils import shuffle
     remin = 1 - percentage
     indexWhereSteeringIsZero = shuffle([i for i in range(len(samples)) if float(samples[i][3]) == 0.0 ])
@@ -287,6 +291,10 @@ def main(_):
     print("Saving the model file .....")
     model.save(FLAGS.model_file)  # creates a HDF5 file 'model.h5'
 
+    # print the illustration of the model
+    print("Printing the model...")
+    from keras.utils.visualize_util import plot
+    plot(model, "model.png", show_shapes=True)
     # lets find how good is the model on the validation and training data
     print("::::Validation data accuracy::::")
     metrics = model.evaluate_generator(validation_generator, total_valid_samples)
