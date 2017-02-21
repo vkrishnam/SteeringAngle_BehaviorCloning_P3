@@ -15,6 +15,7 @@ from io import BytesIO
 from keras.models import load_model
 import h5py
 from keras import __version__ as keras_version
+import cv2
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -60,7 +61,8 @@ def telemetry(sid, data):
         # The current image from the center camera of the car
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
-        image_array = np.asarray(image)
+        image2 = cv2.cvtColor(np.asarray(image), cv2.COLOR_BGR2HSV)
+        image_array = image2 #np.asarray(image2)
         steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
 
         throttle = controller.update(float(speed))
@@ -72,6 +74,7 @@ def telemetry(sid, data):
         if args.image_folder != '':
             timestamp = datetime.utcnow().strftime('%Y_%m_%d_%H_%M_%S_%f')[:-3]
             image_filename = os.path.join(args.image_folder, timestamp)
+            #image = Image.fromarray(cv2.cvtColor(np.asarray(image), cv2.COLOR_HSV2HSV))
             image.save('{}.jpg'.format(image_filename))
     else:
         # NOTE: DON'T EDIT THIS.

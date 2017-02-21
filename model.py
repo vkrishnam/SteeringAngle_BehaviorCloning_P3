@@ -22,11 +22,9 @@ import sklearn
 from keras.models import Sequential, Model
 from keras.layers import Cropping2D
 
-additional = True #False
-
 def generator(samples, folder_name, batch_size=32, corr=0.2):
     """
-     Generator fucntion for the training pipeline
+     Generator function for the training pipeline
     """
     num_samples = len(samples)
     one_time = 0
@@ -39,38 +37,40 @@ def generator(samples, folder_name, batch_size=32, corr=0.2):
             images = []
             angles = []
             for batch_sample in batch_samples:
-                name = folder_name+'/IMG/'+batch_sample[0].split('/')[-1]
-                center_image = cv2.imread(name)
-                center_angle = float(batch_sample[3])
-                images.append(center_image)
-                angles.append(center_angle)
+                for i in range(3):
+                    name = folder_name+'/IMG/'+batch_sample[i].split('/')[-1]
+                    image = cv2.imread(name)
+                    #1
+                    images.append(cv2.cvtColor(image, cv2.COLOR_BGR2HSV))
 
-                # trim image to only see section with road
-                # this would be done as part of the trimming layer in the model itself - as is needed while in driving (drive.py)
+                    # trim image to only see section with road
+                    # this would be done as part of the trimming layer in the model itself - as is needed while in driving (drive.py)
 
-                #Also create the flipversion
-                image_flipped = np.fliplr(center_image)
-                angle_flipped = -1.0*center_angle
+                    #Also create the flipversion
+                    image_flipped = np.fliplr(image)
 
-                images.append(image_flipped)
+                    #2
+                    images.append(cv2.cvtColor(image_flipped, cv2.COLOR_BGR2HSV))
+                #Center and Center Flip
+                angle = float(batch_sample[3])
+                angle_flipped = -1.0*angle
+                angles.append(angle)
                 angles.append(angle_flipped)
 
-                #Also use the Left and Right Images
+                #Left and Left Flip
                 correction = corr # this is a parameter to tune
-                name = folder_name+'/IMG/'+batch_sample[1].split('/')[-1]
-                left_image = cv2.imread(name)
-                left_angle = float(batch_sample[3]) + correction
+                angle = float(batch_sample[3]) + correction
+                angle_flipped = -1.0*angle
+                angles.append(angle)
+                angles.append(angle_flipped)
 
-                name = folder_name+'/IMG/'+batch_sample[2].split('/')[-1]
-                right_image = cv2.imread(name)
-                right_angle = float(batch_sample[3]) - correction
+                #Right and Right Flip
+                correction = corr # this is a parameter to tune
+                angle = float(batch_sample[3]) - correction
+                angle_flipped = -1.0*angle
+                angles.append(angle)
+                angles.append(angle_flipped)
 
-                if additional is True:
-                    images.append(left_image)
-                    angles.append(left_angle)
-
-                    images.append(right_image)
-                    angles.append(right_angle)
 
             X_train = np.array(images)
             y_train = np.array(angles)
@@ -84,6 +84,43 @@ def generator(samples, folder_name, batch_size=32, corr=0.2):
             yield sklearn.utils.shuffle(X_train, y_train)
 
 
+def generator2(samples, folder_name, batch_size=32, corr=0.2):
+    """
+     Generator function for the validation pipeline
+    """
+    num_samples = len(samples)
+    one_time = 0
+    batch_size = batch_size//2
+    while 1: # Loop forever so the generator never terminates
+        shuffle(samples)
+        for offset in range(0, num_samples, batch_size):
+            batch_samples = samples[offset:offset+batch_size]
+
+            images = []
+            angles = []
+            for batch_sample in batch_samples:
+                for i in range(1):
+                    name = folder_name+'/IMG/'+batch_sample[i].split('/')[-1]
+                    image = cv2.imread(name)
+                    #1
+                    images.append(cv2.cvtColor(image, cv2.COLOR_BGR2HSV))
+
+                #Center and Center Flip
+                angle = float(batch_sample[3])
+                angles.append(angle)
+
+            X_valid = np.array(images)
+            y_valid = np.array(angles)
+
+            if one_time == 0:
+                #print("Input Image shape : ", center_image.shape)
+                #print("X_train shape: ", X_train.shape)
+                #print("y_train shape: ", y_train.shape)
+                one_time = 1
+
+            yield sklearn.utils.shuffle(X_valid, y_valid)
+
+
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
@@ -92,7 +129,8 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('data_folder',         '', "Folder where training data from the simulator is.")
 flags.DEFINE_string('model_file',  'model.h5', "File name of the model generated or to be generated.")
 flags.DEFINE_string('num_epoch',            5, "Number of epoch to train the model.")
-flags.DEFINE_string('angle_correction',   0.1, "Parameter to tune the sieering looking from the Left/Right images.")
+flags.DEFINE_string('angle_correction',   0.2, "Parameter to tune the sieering looking from the Left/Right images.")
+flags.DEFINE_string('percentage_zero',   0.9, "Parameter to choose the percentage of zero steering samples to drop.")
 
 def steering_angle_prediction_model_description():
     """
@@ -102,27 +140,24 @@ def steering_angle_prediction_model_description():
     #  Motivated from NVIDIA DaveNet/BB8 Architecture (http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf)
     model = Sequential()
     # Trim the image as part of Preprocess Stage
-    model.add(Cropping2D(cropping=((50,10), (0,0)), input_shape=(160,320,3)))
+    model.add(Cropping2D(cropping=((75,25), (0,0)), input_shape=(160,320,3)))
     # Preprocess incoming data, normalize centered around zero with small standard deviation
-    model.add(Lambda(lambda x: x/127.5 - 1., input_shape=(100, 320, 3), output_shape=(100, 320, 3)))
+    model.add(Lambda(lambda x: x/127.5 - 1., input_shape=(60, 320, 3), output_shape=(60, 320, 3)))
+    # Conv0
+    model.add(Convolution2D(8, 1, 1, activation='relu', name="conv0"))
     # Conv1
-    model.add(Convolution2D(24, 5, 5, name="conv1"))
+    model.add(Convolution2D(16, 3, 3, activation='relu', name="conv1"))
     model.add(MaxPooling2D((2, 2)))
-    model.add(Activation('relu'))
     # Conv2
-    model.add(Convolution2D(36, 5, 5, name="conv2"))
+    model.add(Convolution2D(16, 5, 5, activation='relu', name="conv2"))
     model.add(MaxPooling2D((2, 2)))
-    model.add(Activation('relu'))
     # Conv3
-    model.add(Convolution2D(48, 5, 5, name="conv3"))
+    model.add(Convolution2D(32, 5, 5, activation='relu', name="conv3"))
     model.add(MaxPooling2D((2, 2)))
-    model.add(Activation('relu'))
     # Conv4
-    model.add(Convolution2D(64, 3, 3, name="conv4"))
-    model.add(Activation('relu'))
+    #model.add(Convolution2D(64, 3, 3, activation='relu', name="conv4"))
     # Conv5
-    model.add(Convolution2D(64, 3, 3, name="conv5"))
-    model.add(Activation('relu'))
+    #model.add(Convolution2D(64, 3, 3, activation='relu', name="conv5"))
     # Flatten
     model.add(Flatten())
     # FC1
@@ -142,6 +177,39 @@ def steering_angle_prediction_model_description():
     model.add(Dense(1))
     return model
 
+def plotHistogram1(samples):
+    steering_measurement = []
+    for sample in samples:
+        steering_measurement.append(float(sample[3]))
+
+    steering_measurement = np.array(steering_measurement)
+    steer_hist, binEdges= np.histogram(steering_measurement)
+    print("BinEdge : Population")
+    for edge, bi in zip(binEdges, steer_hist):
+        print("{} : {}".format(str(edge), str(bi)))
+
+    return 0
+
+
+def massageTheData(samples, percentage=0.9):
+    from sklearn.utils import shuffle
+    remin = 1 - percentage
+    indexWhereSteeringIsZero = shuffle([i for i in range(len(samples)) if float(samples[i][3]) == 0.0 ])
+    indexWhereSteeringIsNonZero = shuffle([i for i in range(len(samples)) if float(samples[i][3]) != 0.0 ])
+    print("Number of samples with ZERO steering angle : ", len(indexWhereSteeringIsZero))
+    print("Number of samples with Non-ZERO steering angle : ", len(indexWhereSteeringIsNonZero))
+    print("Total : ", len(indexWhereSteeringIsNonZero)+len(indexWhereSteeringIsZero))
+    newSamples = [samples[i] for i in indexWhereSteeringIsNonZero]
+    vestige = []
+    for i in range(len(indexWhereSteeringIsZero)):
+        if i < (remin*len(indexWhereSteeringIsZero)):
+            newSamples.append(samples[indexWhereSteeringIsZero[i]])
+        else:
+            vestige.append(samples[indexWhereSteeringIsZero[i]])
+
+    return newSamples, vestige
+
+
 
 
 def main(_):
@@ -152,6 +220,8 @@ def main(_):
     samples = []
     num_epochs = int(FLAGS.num_epoch)
 
+    per = float(FLAGS.percentage_zero)
+
     # Open the csv file
     with open(FLAGS.data_folder+'/driving_log.csv') as csvfile:
         reader = csv.reader(csvfile)
@@ -159,6 +229,13 @@ def main(_):
 
         for line in reader:
             samples.append(line)
+
+    #Plot the histogram of data of steering angles
+    plotHistogram1(samples)
+    # Massage the data such that the districutions of samples is more even
+    # Drop the incidence of ZERO steering angle by 90%
+    samples, vestige_samples = massageTheData(samples, per)
+
     #print(samples)
     from sklearn.utils import shuffle
     samples = shuffle(samples)
@@ -166,13 +243,16 @@ def main(_):
     # split the dataset into training and validation
     from sklearn.model_selection import train_test_split
     train_samples, validation_samples = train_test_split(samples, test_size=0.2)
+    for i in range(len(vestige_samples)):
+        validation_samples.append(vestige_samples[i])
 
     print("Num training samples: ", len(train_samples))
     print("Num validation samples: ", len(validation_samples))
+    print("Total samples: ", len(train_samples)+len(validation_samples))
 
     # compile and train the model using the generator function
-    train_generator      = generator(train_samples,      batch_size=32, folder_name = FLAGS.data_folder)#, corr=float(FLAGS.angle_correction))
-    validation_generator = generator(validation_samples, batch_size=32, folder_name = FLAGS.data_folder)#, corr=float(FLAGS.angle_correction))
+    train_generator      = generator(train_samples,      batch_size=32, folder_name = FLAGS.data_folder, corr=float(FLAGS.angle_correction))
+    validation_generator = generator2(validation_samples, batch_size=32, folder_name = FLAGS.data_folder, corr=float(FLAGS.angle_correction))
 
     # Try to load the model
     #   if the model file does not exist then go and define the model
@@ -192,9 +272,8 @@ def main(_):
 
     total_train_samples = len(train_samples)*2
     total_valid_samples = len(validation_samples)*2
-    if additional is True:
-        total_train_samples = len(train_samples)*4
-        total_valid_samples = len(validation_samples)*4
+    total_train_samples = len(train_samples)*6
+    total_valid_samples = len(validation_samples)*6
 
 
     #  Train the model with the generators creating training and validation batches
