@@ -145,31 +145,20 @@ Here is a details of the architecture
 
 The dataset provided by the Udacity is already capturing good driving behavior, and hence no new data is captured/recorded for the track#1. The images of all three cameras (Left, Center and Right) are exploited for the corner cases and even the scenarios of the driving behavior on the the edges of the track.
 
-#####Training process
+#####_Training process_
 
 The dataset is not blindly used for training, when tried the model is seen not to be learn whole lot needed for the successfully driving on the track. Instead the dataset is massaged where a certain percentage of samples having zero steering angle is dropped from the training suite. Just allowing 5% of the samples with zero steering angle is arrived at after few iterations. Idea behind this is borrowed from the reading the [blog] (https://mez.github.io/deep%20learning/2017/02/14/mainsqueeze-the-52-parameter-model-that-drives-in-the-udacity-simulator/).
 
-######Data Augmentation
+######_Data Augmentation_
 
 -_Image Flip:_
 The samples selected for training are also flipped using OpenCV (both Images and steering angles) and appended into the training suite.
-
-Normal Image                                  Flipped Image
-![alt text][image3] ![alt text][image4]
 
 -_Left and Right Camera Images:_
 For the samples selected for the training, the left and right camera images are also considered to included in the training suite after their steering angle is corrected by a factor of +/-0.25.
 Also for these left and right camera images, the flipped versions are also created and included in the training suite.
 
-Left Camera Image                             Left Camera Flipped Image
-
-![alt text][image3] ![alt text][image4]
-
-Right Camera Image                            Right Camera Flipped Image
-
-![alt text][image3] ![alt text][image4]
-
-The Udacity provided dataset had overall 8035 samples, out of which 4630 samples of zero steering angle and 3675 samples of non-zero steering angle.
+The Udacity provided dataset for track#1 has overall 8035 samples, out of which 4630 samples of zero steering angle and 3675 samples of non-zero steering angle.
 
 | Total Samples in Dataset | Samples with zero steering angle | Samples with non-zero steering angle |
 |-------------------------:|---------------------------------:|-------------------------------------:|
