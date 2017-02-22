@@ -63,12 +63,12 @@ The file shows the pipeline I used for training and validating the model, and it
 Although initial Model experimented is highly inspired from NVIDIA end-to-end model architecture. Later it has been pruned to the following to reduce the complexity, size, paramters involved and training/inference times of the model.
 
 For the model articulated in Keras, see the function
-'''sh
+```python
 steering_angle_prediction_model_description()
-'''
+```
 The initial stages of cropping and normalization of pixels has been made as part of the model for two reasons, as those be needed even while model is deployed and other reason being as those operations being done by GPU during training and increasing the training time.
 
-
+Model Illustration
 ![alt text][image9]
 
 ####2. Attempts to reduce overfitting in the model
@@ -76,9 +76,9 @@ The initial stages of cropping and normalization of pixels has been made as part
 The model contains dropout layers in between FullyConnected layers and MaxPolling in between Conv layers in order to reduce overfitting.
 The model was trained and validated on different data sets to ensure that the model was not overfitting.
 See the function
-'''
+```python
 massageTheData(samples, percentage=0.9)
-'''
+```
 The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
 ####3. Model parameter tuning
@@ -117,7 +117,7 @@ Likewise the model is exposed to uniform samples of steering angles, and also th
 The Center, Left and Right images in the training samples are fully expolited so as the model to learn to track extremities. This has been acheived by the angle correction paramter applied to left and right images. This parameter is identified to 0.25 by iterative mechanism
 
 Still on track#1, the simulator was failing to steer properly near the muddy patch. For this the pre-processing step of RGB to HSV conversion is added. This step is added as a pre-processing step even in the drive.py so that same pipeline is replicated for the simulator too.
-
+Muddy patch section with out demarkation:
 ![alt text][image10]
 
 
@@ -134,8 +134,9 @@ The refined model could make simulator run like a dream on both the tracks.
 Once the model was able to run successfully on both the tracks the network pruning activity is taken up becuase the model was heavy with around 300M parameters.
 The numbers of paramters involved in the whole network is anlayzed by plotting the network using Keras utility functions. And finally the following model architecture is arrived with take around 145K parameters without affecting the accuracy or the simulator run.
 
-Here is a visualization of the architecture
+Here is a details of the architecture
 
+Model details:
 ![alt text][image8]
 
 ####3. Creation of the Training Set & Training Process
