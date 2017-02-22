@@ -146,7 +146,7 @@ The dataset provided by the Udacity is already capturing good driving behavior, 
 The dataset is not blindly used for training, when tried the model is seen not to be learn whole lot needed for the successfully driving on the track. Instead the dataset is massaged where a certain percentage of samples having zero steering angle is dropped from the training suite. Just allowing 5% of the samples with zero steering angle is arrived at after few iterations. Idea behind this is borrowed from the reading the [blog] (https://mez.github.io/deep%20learning/2017/02/14/mainsqueeze-the-52-parameter-model-that-drives-in-the-udacity-simulator/).
 
 _Histogram of steering angle in the samples in dataset_
-![alt text][image11]
+![alt text][image1]
 
 
 ######_Data Augmentation_
@@ -164,7 +164,7 @@ The Udacity provided dataset for track#1 has overall 8035 samples, out of which 
 |-------------------------:|---------------------------------:|-------------------------------------:|
 | 8035                     | 4630                             | 3675                                 |
 
-Here is the histogram of steering angles in the dataset. We can know how skewed is the districution.
+Here is the histogram of steering angles in the dataset. We can notice how skewed is the distribution.
 ![alt text][image1]
 
 
