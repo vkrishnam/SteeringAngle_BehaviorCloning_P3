@@ -22,6 +22,62 @@ import sklearn
 from keras.models import Sequential, Model
 from keras.layers import Cropping2D
 
+def dummyGenerator(samples, aug=False):
+    """
+     Dummy Generator function for analyzing the training data
+    """
+    overall = []
+    num_samples = len(samples)
+    one_time = 0
+    batch_size = 32
+    corr = 0.25
+    batch_size = batch_size//2
+    angles = []
+    while 1: # Loop forever so the generator never terminates
+        shuffle(samples)
+        for offset in range(0, num_samples, batch_size):
+            batch_samples = samples[offset:offset+batch_size]
+            for batch_sample in batch_samples:
+
+                #Center and Center Flip
+                angle = float(batch_sample[3])
+                angle_flipped = -1.0*angle
+                angles.append(angle)
+                if aug is True:
+                    angles.append(angle_flipped)
+
+                #Left and Left Flip
+                correction = corr # this is a parameter to tune
+                angle = float(batch_sample[3]) + correction
+                angle_flipped = -1.0*angle
+                if aug is True:
+                    angles.append(angle)
+                    angles.append(angle_flipped)
+
+                #Right and Right Flip
+                correction = corr # this is a parameter to tune
+                angle = float(batch_sample[3]) - correction
+                angle_flipped = -1.0*angle
+                if aug is True:
+                    angles.append(angle)
+                    angles.append(angle_flipped)
+
+
+        #Analyze the steering angles
+        #overall = np.array(angles)
+        overall_steering_angles = np.array(angles)
+        steering_hist, edges = np.histogram(overall_steering_angles, bins=50)
+        if aug is True:
+            print("Hist of training samples with Augmentation")
+        else:
+            print("Hist of training samples without Augmentation")
+
+        print(steering_hist)
+        break
+    return 0
+
+
+
 def generator(samples, folder_name, batch_size=32, corr=0.2):
     """
      Generator function for the training pipeline
@@ -183,7 +239,9 @@ def plotHistogram1(samples):
         steering_measurement.append(float(sample[3]))
 
     steering_measurement = np.array(steering_measurement)
-    steer_hist, binEdges= np.histogram(steering_measurement)
+    steer_hist, binEdges= np.histogram(steering_measurement, bins=50)
+    print(steer_hist)
+    print(binEdges)
     print("BinEdge : Population")
     for edge, bi in zip(binEdges, steer_hist):
         print("{} : {}".format(str(edge), str(bi)))
@@ -256,6 +314,10 @@ def main(_):
     print("Num training samples: ", len(train_samples))
     print("Num validation samples: ", len(validation_samples))
     print("Total samples: ", len(train_samples)+len(validation_samples))
+
+    # Generate Distributions of the steering angle
+    #dummyGenerator(train_samples, aug=False)
+    #dummyGenerator(train_samples, aug=True)
 
     # compile and train the model using the generator function
     train_generator      = generator(train_samples,      batch_size=32, folder_name = FLAGS.data_folder, corr=float(FLAGS.angle_correction))
