@@ -22,7 +22,7 @@ The goals / steps of this project are the following:
 
 [image1]: ./artifacts/steeringAngleHistogramInDataSet.png "steeringAngleHistogramInDataSet"
 [image2]: ./artifacts/steeringAngleHistogramAfterDroppingZeroSteeringSamplesInDataSet.png  "steeringAngleHistogramAfterDroppingZeroSteeringSamplesInDataSet.png"
-[image3]: ./artifacts/steeringAngleHistogramInTrainingSuitepng "steeringAngleHistogramInTrainingSuite"
+[image3]: ./artifacts/steeringAngleHistogramInTrainingSuite.png "steeringAngleHistogramInTrainingSuite"
 [image8]: ./artifacts/model.png "Model Architecture"
 [image9]: ./artifacts/modelIlustration.png "Model Architecture Illustrated"
 [image10]: ./artifacts/muddyPatchSection.png "Muddy Patch section"
