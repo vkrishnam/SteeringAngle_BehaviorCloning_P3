@@ -109,7 +109,7 @@ This model might be appropriate because as the CNN digests the scene interms of 
 
 When trained on the data set with a blind train/validation split of 80:20, the both loss and accuracy were good both on training and validation set. But the simulator was not able to run in autonomous mode, but more it was going in a straight line becuase of steering anlge prediction hovering around zero value. Then more trails were done with the model to find that this behavior has nothing to do with model but more to do with the dataset and the pre-processing/data engineering of it.
 
-######Data Engineering
+######_Data Engineering_
 The dataset is analyzed as a distribution of steering angle by ploting a histogram to show a highly skewed distribution with maximum samples of zero steering angle.
 So it was conclusive enough that the earlier training trails were dominated by the zero steering angle data where by model was not learning except to predict zero steering angle.
 Hence the data samples in the dataset corresponding to zero steering angle are seperated out where only a certain percentage of those samples randomly added to the training dataset. And the remaining samples were made part of the earlier split validation dataset.
@@ -137,6 +137,7 @@ The numbers of paramters involved in the whole network is anlayzed by plotting t
 Here is a details of the architecture
 
 **_Model details:_**
+
 ![alt text][image8]
 
 ####3. Creation of the Training Set & Training Process
