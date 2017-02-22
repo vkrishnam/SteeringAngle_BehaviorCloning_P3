@@ -150,13 +150,13 @@ The dataset is not blindly used for training, when tried the model is seen not t
 
 ######Data Augmentation
 
--Image Flip:
+-_Image Flip:_
 The samples selected for training are also flipped using OpenCV (both Images and steering angles) and appended into the training suite.
 
 Normal Image                                  Flipped Image
 ![alt text][image3] ![alt text][image4]
 
--Left and Right Camera Images:
+-_Left and Right Camera Images:_
 For the samples selected for the training, the left and right camera images are also considered to included in the training suite after their steering angle is corrected by a factor of +/-0.25.
 Also for these left and right camera images, the flipped versions are also created and included in the training suite.
 
@@ -171,13 +171,13 @@ Right Camera Image                            Right Camera Flipped Image
 The Udacity provided dataset had overall 8035 samples, out of which 4630 samples of zero steering angle and 3675 samples of non-zero steering angle.
 
 | Total Samples in Dataset | Samples with zero steering angle | Samples with non-zero steering angle |
-|--------------------------|---------------------------------:|-------------------------------------:|
+|-------------------------:|---------------------------------:|-------------------------------------:|
 | 8035                     | 4630                             | 3675                                 |
 
 After dropping the samples of zero steering angles by 95% randomly, we naturally end up with
 
 | Total Samples in Dataset | Samples considered for training  | Samples considered for validation    |
-|--------------------------|---------------------------------:|-------------------------------------:|
+|-------------------------:|---------------------------------:|-------------------------------------:|
 | 8035                     | 3115                             | 4920                                 |
 
 With the above sample division we end with following number of images for the training (center + 5 (center_flip,left, left_flip, right, right_flip) augmeted images) and validation suite:
@@ -186,7 +186,7 @@ With the above sample division we end with following number of images for the tr
 |---------------------------:|--------------------------:|
 | 4920                       | 18690                     |
 
-Training this for 3 epochs ends in the following range of loss and accuracy.
+Training this dataset for 3 epochs ends in the following range of loss and accuracy.
 ```
 18690/18690 [==============================] - 102s - loss: 0.0407 - acc: 0.0184 - val_loss: 0.0161 - val_acc: 0.8510
 Epoch 2/3
@@ -194,15 +194,39 @@ Epoch 2/3
 Epoch 3/3
 18690/18690 [==============================] - 101s - loss: 0.0279 - acc: 0.0184 - val_loss: 0.0191 - val_acc: 0.8508
 ```
+Point to note here is that, the validation suite, which has just the center images which would be only fed during the autonomous run, has a high accurary of ~85% which shows correspondence to the test driving success on the track.
+**NOTE: Use of an adam optimizer makes the tuning of the learning rate unnecessary.**
 
-![alt text][image6]
-![alt text][image7]
+Later for the track#2, one lap data of good driving behavior is recorded and merge with the original dataset from the Udacity.
+Following the above described approach we end up in
 
-Etc ....
+| Total Samples in Dataset | Samples with zero steering angle | Samples with non-zero steering angle |
+|-------------------------:|---------------------------------:|-------------------------------------:|
+| 10310                    | 5720                             | 4590                                 |
 
-After the collection process, I had X number of data points. I then preprocessed this data by ...
 
+After dropping the samples of zero steering angles by 95% randomly, we naturally end up with
 
-I finally randomly shuffled the data set and put Y% of the data into a validation set.
+| Total Samples in Dataset | Samples considered for training  | Samples considered for validation    |
+|-------------------------:|---------------------------------:|-------------------------------------:|
+| 10310                    | 3901                             | 6409                                 |
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+With the above sample division we end with following number of images for the training (center + 5 (center_flip,left, left_flip, right, right_flip) augmeted images) and validation suite:
+
+| Total images in Validation | Total images in Training  |
+|---------------------------:|--------------------------:|
+| 6409                       | 23406                     |
+
+Training this dataset for 3 epochs ends in the following range of loss and accuracy.
+```
+23406/23406 [==============================] - 129s - loss: 0.0826 - acc: 0.0294 - val_loss: 0.0544 - val_acc: 0.8084
+Epoch 2/3
+23406/23406 [==============================] - 128s - loss: 0.0650 - acc: 0.0328 - val_loss: 0.0524 - val_acc: 0.8064
+Epoch 3/3
+23406/23406 [==============================] - 129s - loss: 0.0637 - acc: 0.0329 - val_loss: 0.0492 - val_acc: 0.8070
+```
+Another 3 epoch of further fine tuning is only done with the track#2 data, which further reinforces the track#2 details into model and also to compensate for the lack of enough data samples as compared to the track#1 data.
+
+The final model is able to successfully run on both tracks with the speed set to 9 mph.
+Also to note, the simulator window dimensions had to kept at minimum for the lack of enough PC resources.
+
