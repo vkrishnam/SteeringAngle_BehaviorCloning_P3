@@ -28,7 +28,7 @@ The goals / steps of this project are the following:
 [image6]: ./examples/placeholder_small.png "Normal Image"
 [image7]: ./examples/placeholder_small.png "Flipped Image"
 [image8]: ./artifacts/model.png "Model Architecture"
-[image9]: ./artifacts/modelIllustration.png "Model Architecture Illustrated"
+[image9]: ./artifacts/modelIlustration.png "Model Architecture Illustrated"
 [image10]: ./artifacts/muddyPatchSection.png "Muddy Patch section"
 
 ## Rubric Points
