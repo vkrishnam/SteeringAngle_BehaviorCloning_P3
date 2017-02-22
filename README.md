@@ -117,9 +117,10 @@ Likewise the model is exposed to uniform samples of steering angles, and also th
 The Center, Left and Right images in the training samples are fully expolited so as the model to learn to track extremities. This has been acheived by the angle correction paramter applied to left and right images. This parameter is identified to 0.25 by iterative mechanism
 
 Still on track#1, the simulator was failing to steer properly near the muddy patch. For this the pre-processing step of RGB to HSV conversion is added. This step is added as a pre-processing step even in the drive.py so that same pipeline is replicated for the simulator too.
+
 **Muddy patch section with out demarkation in Track#1**
 ![alt text][image10]
-
+![](./artifacts/muddyPatchSection.png =320x160)
 
 At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
 
