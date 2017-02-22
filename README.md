@@ -169,6 +169,7 @@ Right Camera Image                            Right Camera Flipped Image
 ![alt text][image3] ![alt text][image4]
 
 The Udacity provided dataset had overall 8035 samples, out of which 4630 samples of zero steering angle and 3675 samples of non-zero steering angle.
+
 | Total Samples in Dataset | Samples with zero steering angle | Samples with non-zero steering angle |
 |--------------------------|---------------------------------:|-------------------------------------:|
 | 8035                     | 4630                             | 3675                                 |
@@ -180,6 +181,7 @@ After dropping the samples of zero steering angles by 95% randomly, we naturally
 | 8035                     | 3115                             | 4920                                 |
 
 With the above sample division we end with following number of images for the training (center + 5 (center_flip,left, left_flip, right, right_flip) augmeted images) and validation suite:
+
 | Total images in Validation | Total images in Training  |
 |---------------------------:|--------------------------:|
 | 4920                       | 18690                     |
