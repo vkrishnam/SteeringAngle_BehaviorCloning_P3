@@ -142,19 +142,56 @@ Here is a details of the architecture
 
 ####3. Creation of the Training Set & Training Process
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+The dataset provided by the Udacity is already capturing good driving behavior, and hence no new data is captured/recorded for the track#1. The images of all three cameras (Left, Center and Right) are exploited for the corner cases and even the scenarios of the driving behavior on the the edges of the track.
 
-![alt text][image2]
+#####Training process
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+The dataset is not blindly used for training, when tried the model is seen not to be learn whole lot needed for the successfully driving on the track. Instead the dataset is massaged where a certain percentage of samples having zero steering angle is dropped from the training suite. Just allowing 5% of the samples with zero steering angle is arrived at after few iterations. Idea behind this is borrowed from the reading the [blog] (https://mez.github.io/deep%20learning/2017/02/14/mainsqueeze-the-52-parameter-model-that-drives-in-the-udacity-simulator/).
 
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
+######Data Augmentation
 
-Then I repeated this process on track two in order to get more data points.
+-Image Flip:
+The samples selected for training are also flipped using OpenCV (both Images and steering angles) and appended into the training suite.
 
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
+Normal Image                                  Flipped Image
+![alt text][image3] ![alt text][image4]
+
+-Left and Right Camera Images:
+For the samples selected for the training, the left and right camera images are also considered to included in the training suite after their steering angle is corrected by a factor of +/-0.25.
+Also for these left and right camera images, the flipped versions are also created and included in the training suite.
+
+Left Camera Image                             Left Camera Flipped Image
+
+![alt text][image3] ![alt text][image4]
+
+Right Camera Image                            Right Camera Flipped Image
+
+![alt text][image3] ![alt text][image4]
+
+The Udacity provided dataset had overall 8035 samples, out of which 4630 samples of zero steering angle and 3675 samples of non-zero steering angle.
+| Total Samples in Dataset | Samples with zero steering angle | Samples with non-zero steering angle |
+|--------------------------|---------------------------------:|-------------------------------------:|
+| 8035                     | 4630                             | 3675                                 |
+
+After dropping the samples of zero steering angles by 95% randomly, we naturally end up with
+
+| Total Samples in Dataset | Samples considered for training  | Samples considered for validation    |
+|--------------------------|---------------------------------:|-------------------------------------:|
+| 8035                     | 3115                             | 4920                                 |
+
+With the above sample division we end with following number of images for the training (center + 5 (center_flip,left, left_flip, right, right_flip) augmeted images) and validation suite:
+| Total images in Validation | Total images in Training  |
+|---------------------------:|--------------------------:|
+| 4920                       | 18690                     |
+
+Training this for 3 epochs ends in the following range of loss and accuracy.
+```
+18690/18690 [==============================] - 102s - loss: 0.0407 - acc: 0.0184 - val_loss: 0.0161 - val_acc: 0.8510
+Epoch 2/3
+18690/18690 [==============================] - 102s - loss: 0.0290 - acc: 0.0185 - val_loss: 0.0173 - val_acc: 0.8510
+Epoch 3/3
+18690/18690 [==============================] - 101s - loss: 0.0279 - acc: 0.0184 - val_loss: 0.0191 - val_acc: 0.8508
+```
 
 ![alt text][image6]
 ![alt text][image7]
