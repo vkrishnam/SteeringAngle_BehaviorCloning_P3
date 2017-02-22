@@ -20,13 +20,9 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/placeholder.png "Model Visualization"
-[image2]: ./examples/placeholder.png "Grayscaling"
-[image3]: ./examples/placeholder_small.png "Recovery Image"
-[image4]: ./examples/placeholder_small.png "Recovery Image"
-[image5]: ./examples/placeholder_small.png "Recovery Image"
-[image6]: ./examples/placeholder_small.png "Normal Image"
-[image7]: ./examples/placeholder_small.png "Flipped Image"
+[image1]: ./artifacts/steeringAngleHistogramInDataSet.png "steeringAngleHistogramInDataSet"
+[image2]: ./artifacts/steeringAngleHistogramAfterDroppingZeroSteeringSamplesInDataSet.png  "steeringAngleHistogramAfterDroppingZeroSteeringSamplesInDataSet.png"
+[image3]: ./artifacts/steeringAngleHistogramInTrainingSuitepng "steeringAngleHistogramInTrainingSuite"
 [image8]: ./artifacts/model.png "Model Architecture"
 [image9]: ./artifacts/modelIlustration.png "Model Architecture Illustrated"
 [image10]: ./artifacts/muddyPatchSection.png "Muddy Patch section"
@@ -149,6 +145,10 @@ The dataset provided by the Udacity is already capturing good driving behavior, 
 
 The dataset is not blindly used for training, when tried the model is seen not to be learn whole lot needed for the successfully driving on the track. Instead the dataset is massaged where a certain percentage of samples having zero steering angle is dropped from the training suite. Just allowing 5% of the samples with zero steering angle is arrived at after few iterations. Idea behind this is borrowed from the reading the [blog] (https://mez.github.io/deep%20learning/2017/02/14/mainsqueeze-the-52-parameter-model-that-drives-in-the-udacity-simulator/).
 
+_Histogram of steering angle in the samples in dataset_
+![alt text][image11]
+
+
 ######_Data Augmentation_
 
 -_Image Flip:_
@@ -164,17 +164,28 @@ The Udacity provided dataset for track#1 has overall 8035 samples, out of which 
 |-------------------------:|---------------------------------:|-------------------------------------:|
 | 8035                     | 4630                             | 3675                                 |
 
+Here is the histogram of steering angles in the dataset. We can know how skewed is the districution.
+![alt text][image1]
+
+
 After dropping the samples of zero steering angles by 95% randomly, we naturally end up with
 
 | Total Samples in Dataset | Samples considered for training  | Samples considered for validation    |
 |-------------------------:|---------------------------------:|-------------------------------------:|
 | 8035                     | 3115                             | 4920                                 |
 
+
+Here is the histogram of steering angles after dropping 95% of zero steering angle samples in the dataset. Still the distribution is not even.
+![alt text][image2]
+
 With the above sample division we end with following number of images for the training (center + 5 (center_flip,left, left_flip, right, right_flip) augmeted images) and validation suite:
 
 | Total images in Validation | Total images in Training  |
 |---------------------------:|--------------------------:|
 | 4920                       | 18690                     |
+
+Here is the histogram of steering angles in the training suite with augmentation. We can know how that the distribution is better even, but still lot of scope to cover the entire range.
+![alt text][image3]
 
 Training this dataset for 3 epochs ends in the following range of loss and accuracy.
 ```
@@ -215,7 +226,7 @@ Epoch 2/3
 Epoch 3/3
 23406/23406 [==============================] - 129s - loss: 0.0637 - acc: 0.0329 - val_loss: 0.0492 - val_acc: 0.8070
 ```
-Another 3 epoch of further fine tuning is only done with the track#2 data, which further reinforces the track#2 details into model and also to compensate for the lack of enough data samples as compared to the track#1 data.
+Another 3 epochs of further fine tuning is done with the track#2 data only, which further reinforces the track#2 details into model and also to compensate for the lack of enough data samples as compared to the track#1 data.
 
 The final model is able to successfully run on both tracks with the speed set to 9 mph.
 Also to note, the simulator window dimensions had to kept at minimum for the lack of enough PC resources.
