@@ -23,6 +23,11 @@ The goals / steps of this project are the following:
 [image1]: ./artifacts/steeringAngleHistogramInDataSet.png "steeringAngleHistogramInDataSet"
 [image2]: ./artifacts/steeringAngleHistogramAfterDroppingZeroSteeringSamplesInDataSet.png  "steeringAngleHistogramAfterDroppingZeroSteeringSamplesInDataSet.png"
 [image3]: ./artifacts/steeringAngleHistogramInTrainingSuite.png "steeringAngleHistogramInTrainingSuite"
+[image4]: ./artifacts/thisIsWhatFirstConvLayerSees.png "conv1 perception"
+[image5]: ./artifacts/thisIsWhatSecondConvLayerSees.png "conv2 perception"
+[image6]: ./artifacts/thisIsWhatThirdConvLayerSees.png "conv3 perception"
+[image7]: ./artifacts/thisIsWhatFourthConvLayerSees.png "conv4 perception"
+[image11]: ./artifacts/thisIsWhatFifthConvLayerSees.png "conv5 perception"
 [image8]: ./artifacts/model.png "Model Architecture"
 [image9]: ./artifacts/modelIlustration.png "Model Architecture Illustrated"
 [image10]: ./artifacts/muddyPatchSection.png "Muddy Patch section"
@@ -125,6 +130,29 @@ At first model is afresh trained with consolidated data for 3 epoch with the sam
 Then the mode is fine tuned with track#2 data alone for 3 more epochs with training strategy of retaining only 3% of zero steering angle data.
 
 The refined model could make simulator run like a dream on both the tracks.
+
+Lets have a look into what different conv layers are perceiving.
+
+Conv1
+![alt text][image4]
+
+
+Conv2
+![alt text][image5]
+
+
+Conv3
+![alt text][image6]
+
+
+Conv4
+![alt text][image7]
+
+
+Conv5
+![alt text][image11]
+
+Overall it  looks the conv layers are arriving at the drivable area in the image.
 
 ####2. Final Model Architecture
 
